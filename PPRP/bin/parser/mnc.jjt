@@ -22,22 +22,22 @@ public class mnc
 {
   public static QTList qtTable = new QTList();
 
-  public static String cifaFile = "E://Java-workspace//PPRP//src//testFile//lexical.txt";
+  public static String cifaFile = ".//src//testFile//lexical.txt";
 
-  public static String yufaFile = "E://Java-workspace//PPRP//src//testFile//yufa.txt";
+  public static String yufaFile = ".//src//testFile//yufa.txt";
 
-  public static String yuyiFile = "E://Java-workspace//PPRP//src//testFile//yuyi.txt";
+  public static String yuyiFile = ".//src//testFile//yuyi.txt";
 
-  public static String errorFile = "E://Java-workspace//PPRP//src//testFile//error.txt";
+  public static String errorFile = ".//src//testFile//error.txt";
 
   public static boolean haveError = false;
 
   //for错误检查
   public static String S = "";
 
-  public static ArrayList < MyNode > mylist = new ArrayList < MyNode > ();
+  public static ArrayList < Record > mylist = new ArrayList < Record > ();
 
-  public static MyNodeList mynodelist = new MyNodeList(mylist);
+  public static RecordList RecordList = new RecordList(mylist);
 
   public void printQTList()
   {
@@ -46,20 +46,20 @@ public class mnc
 
   public static void main(String args [])
   {
-    try
-    {
-      File file = new File("E://Java-workspace//PPRP//2.txt");
-      FileInputStream fis = new FileInputStream(file);
-      mnc mm = new mnc(fis);
-      SimpleNode n = mm.Start();
-      n.dump("");
-      mm.printQTList();
-    }
-    catch (Exception e)
-    {
-      System.out.println("error\n" + e.getMessage());
-      e.printStackTrace();
-    }
+//    try
+//    {
+//      File file = new File("E://Java-workspace//PPRP//2.txt");
+//      FileInputStream fis = new FileInputStream(file);
+//      mnc mm = new mnc(fis);
+//      SimpleNode n = mm.Start();
+//      n.dump("");
+//      mm.printQTList();
+//    }
+//    catch (Exception e)
+//    {
+//      System.out.println("error\n" + e.getMessage());
+//      e.printStackTrace();
+//    }
     //    try
     //    {
     //      File file = new File("E://Java-workspace//PPRP//src//testFile//1.txt");
@@ -406,13 +406,13 @@ void DecState() :
   String name = null;
   //临时变量
   String tps = null;
-  MyNode tempNode = null;
+  Record tempNode = null;
 }
 {
   t = type() node = < IDENTIFIER >
   {
     name = node.image;
-    if (mynodelist.getSize() != 0 && mynodelist.isCunZai(name))
+    if (RecordList.getSize() != 0 && RecordList.ifExist(name))
     {
       tps = "变量" + name + "之前已经声明过" + "\n";
       S += tps;
@@ -421,8 +421,8 @@ void DecState() :
     }
     else
     {
-      tempNode = new MyNode(name, t.image);
-      mynodelist.addNode(tempNode);
+      tempNode = new Record(name, t.image);
+      RecordList.addNode(tempNode);
     }
   }
   (
@@ -446,9 +446,9 @@ void AssState() :
     QTInfo info = new QTInfo(op.image, str, "_", id.image);
     qtTable.addQTInfo(info);
     //错误分析部分
-    if (mynodelist.getSize() != 0)
+    if (RecordList.getSize() != 0)
     {
-      if (!mynodelist.isCunZai(id.image))
+      if (!RecordList.ifExist(id.image))
       {
         tps = "\u53d8\u91cf" + id.image + "\u4f7f\u7528\u65f6\u672a\u5b9a\u4e49" + "\n";
         S += tps;

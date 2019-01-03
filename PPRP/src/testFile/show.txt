@@ -27,4 +27,5 @@ int main()
         }
     }
     int ans;
+    test = 0;
 }  
