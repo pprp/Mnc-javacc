@@ -1,0 +1,17 @@
+int main()
+{
+    int a;
+    a = 2;
+    int output;
+    switch(a)
+	{
+        case 1:
+        	output = 2;
+        	break;
+        case 2:
+        	output = 1;
+        	break;
+        default:
+        	output = 3;
+	}    
+}

@@ -1,0 +1,30 @@
+int main()  
+{  
+    int ans;ans = 0;int i;  
+    int num;num = 12;int output;
+    for(i = 0 ; i < 10 ; i++)  
+    {
+        if(ans < n){  
+            ans = ans * 2 + 3 - 1;  
+        }else{  
+            ans = ans * 3 - 1;  
+        }  
+        do{
+            ans = ans-2;  
+        }while(ans > 12);   
+        while(n > 3){  
+            ans = ans-2;          
+        }  
+        switch(ans){
+            case 1:
+                output = num;
+                break;
+            case 2:
+                output = num * num;
+                break;
+            default:
+                output = 0;                
+        }
+    }
+    int ans;
+}  

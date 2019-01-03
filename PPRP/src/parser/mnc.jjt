@@ -1,0 +1,918 @@
+/**
+ * JJTree template file created by SF JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
+ */
+options
+{
+  JDK_VERSION = "1.8";
+
+  static = false;
+}
+
+PARSER_BEGIN(mnc)
+package parser;
+import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import utils.*;
+import java.io.PrintStream;
+import java.util.ArrayList;
+
+public class mnc
+{
+  public static QTList qtTable = new QTList();
+
+  public static String cifaFile = "E://Java-workspace//PPRP//src//testFile//lexical.txt";
+
+  public static String yufaFile = "E://Java-workspace//PPRP//src//testFile//yufa.txt";
+
+  public static String yuyiFile = "E://Java-workspace//PPRP//src//testFile//yuyi.txt";
+
+  public static String errorFile = "E://Java-workspace//PPRP//src//testFile//error.txt";
+
+  public static boolean haveError = false;
+
+  //for错误检查
+  public static String S = "";
+
+  public static ArrayList < MyNode > mylist = new ArrayList < MyNode > ();
+
+  public static MyNodeList mynodelist = new MyNodeList(mylist);
+
+  public void printQTList()
+  {
+    qtTable.printQTTable();
+  }
+
+  public static void main(String args [])
+  {
+    try
+    {
+      File file = new File("E://Java-workspace//PPRP//2.txt");
+      FileInputStream fis = new FileInputStream(file);
+      mnc mm = new mnc(fis);
+      SimpleNode n = mm.Start();
+      n.dump("");
+      mm.printQTList();
+    }
+    catch (Exception e)
+    {
+      System.out.println("error\n" + e.getMessage());
+      e.printStackTrace();
+    }
+    //    try
+    //    {
+    //      File file = new File("E://Java-workspace//PPRP//src//testFile//1.txt");
+    //      FileInputStream fis = new FileInputStream(file);
+    //      mnc mm = new mnc(fis);
+    //      //yuyi(mm);
+    //      //cifa("E://Java-workspace//PPRP//2.txt");
+    //      run("E://Java-workspace//PPRP//2.txt");
+    //    }
+    //    catch (Exception e)
+    //    {
+    //      e.printStackTrace();
+    //    }
+  }
+
+  public static void run(String FilePath) throws FileNotFoundException
+  {
+    try
+    {
+      //词法部分
+      File file = new File(FilePath);
+      SimpleCharStream scs = new SimpleCharStream(new FileInputStream(file));
+      //输出流
+      FileOutputStream fos1 = new FileOutputStream(cifaFile); //词法
+      FileOutputStream fos2 = new FileOutputStream(yufaFile); //语法
+      FileOutputStream fos3 = new FileOutputStream(yuyiFile); //语义
+      PrintStream LexicalStream1 = new PrintStream(fos1);
+      PrintStream LexicalStream2 = new PrintStream(fos2);
+      PrintStream LexicalStream3 = new PrintStream(fos3);
+      //词法部分，得到lexicalStr
+      mncTokenManager mtm = new mncTokenManager(scs);
+      Token a = mtm.getNextToken();
+      String lexicalStr = "";
+      while (a.kind != EOF)
+      {
+        lexicalStr += a.kind;
+        lexicalStr += "\t";
+        lexicalStr += a.image;
+        lexicalStr += "\n";
+        System.out.println(a.kind + "\t" + a.image);
+        a = mtm.getNextToken();
+      }
+      //将流传送到文件
+      LexicalStream1.print(lexicalStr);
+      //关闭流
+      //fos1.close();
+      //LexicalStream1.close();
+      //语法分析，得到syntaxStr
+      mnc tmp = new mnc(new FileInputStream(new File(FilePath)));
+      SimpleNode n = tmp.Start();
+      System.setOut(LexicalStream2);
+      n.dump("");
+      //关闭所有的流
+      //fos2.close();
+      //LexicalStream2.close();
+      //语义分析
+      System.setOut(LexicalStream3);
+      tmp.printQTList();
+      fos1.close();
+      LexicalStream1.close();
+      fos2.close();
+      LexicalStream2.close();
+      fos3.close();
+      LexicalStream3.close();
+    }
+    catch (Exception e)
+    {
+      e.printStackTrace();
+    }
+  }
+
+  public static void yuyi(mnc mm) throws FileNotFoundException
+  {
+    try
+    {
+      SimpleNode n = mm.Start();
+      FileOutputStream fos = new FileOutputStream(yuyiFile);
+      PrintStream ps = new PrintStream(fos);
+      System.setOut(ps);
+      dumps("", n, ps);
+      fos.close();
+      ps.close();
+    }
+    catch (Exception e)
+    {
+      System.out.println("error\n" + e.getMessage());
+      e.printStackTrace();
+    }
+  }
+
+  public static void dumps(String prefix, SimpleNode sn, PrintStream ps)
+  {
+    ps.println(prefix);
+    if (sn.children != null)
+    {
+      for (int i = 0; i < sn.children.length; ++i)
+      {
+        SimpleNode n = (SimpleNode) sn.children [i];
+        if (n != null)
+        {
+          n.dump(prefix + "  ");
+        }
+      }
+    }
+  }
+
+  public static void cifa(String FilePath) throws FileNotFoundException
+  {
+    try
+    {
+      File file = new File(FilePath);
+      SimpleCharStream scs = new SimpleCharStream(new FileInputStream(file));
+      FileOutputStream fos = new FileOutputStream(cifaFile);
+      PrintStream LexicalStream = new PrintStream(fos);
+      mncTokenManager mtm = new mncTokenManager(scs);
+      Token a = mtm.getNextToken();
+      String lexicalStr = "";
+      while (a.kind != EOF)
+      {
+        lexicalStr += a.kind;
+        lexicalStr += "\t";
+        lexicalStr += a.image;
+        lexicalStr += "\n";
+        System.out.println(a.kind + "\t" + a.image);
+        a = mtm.getNextToken();
+      }
+      LexicalStream.print(lexicalStr);
+      fos.close();
+      LexicalStream.close();
+    }
+    catch (Exception e)
+    {
+      System.out.println("Oops.");
+      System.out.println(e.getMessage());
+    }
+  }
+}
+
+PARSER_END(mnc)
+
+SKIP :
+{
+  " "
+| "\t"
+| "\n"
+| "\r"
+| < "//" (~[ "\n", "\r" ])*
+    (
+      "\n"
+    | "\r"
+    | "\r\n"
+    ) >
+| < "/*" (~[ "*" ])* "*"
+    (
+      ~[ "/" ] (~[ "*" ])* "*"
+    )*
+    "/" >
+}
+
+TOKEN : /* LITERALS */
+{
+  < INTEGER_LITERAL :
+    < DECIMAL_LITERAL > ([ "l", "L" ])?
+  | < HEX_LITERAL > ([ "l", "L" ])?
+  | < OCTAL_LITERAL > ([ "l", "L" ])? 
+  >
+| < #DECIMAL_LITERAL : [ "1"-"9" ] ([ "0"-"9" ])* >
+| < #HEX_LITERAL : "0" [ "x", "X" ] ([ "0"-"9", "a"-"f", "A"-"F" ])+ >
+| < #OCTAL_LITERAL : "0" ([ "0"-"7" ])* >
+}
+
+TOKEN : /* KEYWORDS */		
+{		
+  < IF : "if" >		
+| < ELSE : "else" >		
+| < INT : "int" >
+| < CHAR : "char" >
+| < DOUBLE : "double" >
+| < FLOAT : "float" >
+| < VOID : "void" >		
+| < RETURN : "return" >		
+| < WHILE : "while" >
+| < MAIN : "main" >
+| < BREAK : "break" >
+| < DEFAULT1 : "default" >
+| < SWITCH : "switch" >
+| < DO : "do" >
+| < BOOL : "bool" >
+| < FOR : "for" >
+| < CASE : "case" >
+}	
+
+TOKEN : /* IDENTIFIERS */
+{
+  < IDENTIFIER :
+    < LETTER >
+    (
+      < LETTER >
+    | < DIGIT >
+    )* >
+| < #LETTER : [ "_", "a"-"z", "A"-"Z" ] >
+| < #DIGIT : [ "0"-"9" ] >
+}
+
+TOKEN : /* FLOAT */
+{
+  < FLOAT_NUM :
+    [ "1"-"9" ] ([ "0"-"9" ])* "." ([ "0"-"9" ])*
+  | "0." ([ "0"-"9" ])* 
+  >
+}
+
+TOKEN : /*CONSTANT*/		
+{		
+  < INTCONSTRANT :		
+    (< DIGIT >)+		
+    (		
+      "l"
+    | "L"		
+    )? >		
+}
+
+TOKEN : /* SEPARATER */		
+{		
+  < SEMI : ";" >
+| < COLON : ":" >		
+| < LB : "(" >		
+| < RB : ")" >		
+| < COMMA : "," >		
+| < LCB : "{" >		
+| < RCB : "}" >		
+| < LSB : "[" >		
+| < RSB : "]" >		
+}
+
+TOKEN : /* OPERATORs */		
+{		
+  < ADD : "+" >		
+| < MINUS : "-" >		
+| < MULTIPLY : "*" >		
+| < DIVIDE : "/" >		
+| < GREATER : ">" >		
+| < SMALLER : "<" >		
+| < EQUAL : "=" >
+| < LE : "<=" >
+| < GE : ">=" >
+| < EE : "==" >
+| < NE : "!=" >
+| < QUYU : "%" >
+| < AND : "&&" >
+| < OR : "||" >
+| < NOT : "!" >
+| < AUTOADD : "++" >
+| < AUTOSUBTRACT : "--" >
+}
+
+SimpleNode Start() :
+{}
+{
+  Program() < EOF >
+  {
+    return jjtThis;
+  }
+}
+
+Token type() :
+{
+  Token t = null;
+}
+{
+  t = < INT >
+  {
+    return t;
+  }
+| t = < FLOAT >
+  {
+    return t;
+  }
+| t = < DOUBLE >
+  {
+    return t;
+  }
+| t = < CHAR >
+  {
+    return t;
+  }
+| t = < VOID >
+  {
+    return t;
+  }
+}
+
+void Program() :
+{}
+{
+  type() < MAIN > 
+  < LB >
+  (
+    type() Identifier()
+  )*
+  < RB > 
+  StateBlock()
+}
+
+void StateBlock() :
+{
+}
+{
+  State()
+| 
+  < LCB >
+  (
+    StateBlock()
+  )*
+  < RCB >
+}
+
+void State() :
+{
+}
+{
+  SeqState()
+| BranchState()
+| LoopState()
+}
+
+void SeqState() :
+{
+}
+{
+  (
+    DecState()
+  | AssState()
+  | BreakState()
+  )
+  < SEMI >
+}
+
+void DecState() :
+{
+  Token t = null;
+  Token node = null;
+  //检查是否重复定义
+  String name = null;
+  //临时变量
+  String tps = null;
+  MyNode tempNode = null;
+}
+{
+  t = type() node = < IDENTIFIER >
+  {
+    name = node.image;
+    if (mynodelist.getSize() != 0 && mynodelist.isCunZai(name))
+    {
+      tps = "变量" + name + "之前已经声明过" + "\n";
+      S += tps;
+      tps = null;
+      haveError = true;
+    }
+    else
+    {
+      tempNode = new MyNode(name, t.image);
+      mynodelist.addNode(tempNode);
+    }
+  }
+  (
+  < COMMA > < IDENTIFIER >
+  )*
+}
+
+void AssState() :
+{
+  Token id;
+  Token op;
+  String str;
+  //临时变量
+  String tps;
+}
+{
+  id = < IDENTIFIER > 
+  op = < EQUAL > 
+  str = Expression()
+  {
+    QTInfo info = new QTInfo(op.image, str, "_", id.image);
+    qtTable.addQTInfo(info);
+    //错误分析部分
+    if (mynodelist.getSize() != 0)
+    {
+      if (!mynodelist.isCunZai(id.image))
+      {
+        tps = "\u53d8\u91cf" + id.image + "\u4f7f\u7528\u65f6\u672a\u5b9a\u4e49" + "\n";
+        S += tps;
+        tps = null;
+        haveError = true;
+      }
+    }
+  }
+}
+
+void BreakState() :
+{
+  Token t = null;
+}
+{
+  t = < BREAK >
+}
+
+void BranchState() :
+{
+}
+{
+  IfState()
+| SwitchState()
+}
+
+//switch-case语句
+void SwitchState() :
+{
+  int quad;
+  int quad1;
+  String res = null; //存放E的结果
+  Token t;
+}
+{
+  < SWITCH > "(" 
+  res = AdditiveExpression() ")" 
+  "{"
+  (
+    < CASE > 
+    t = < INTEGER_LITERAL > ":"
+    {
+      //得到下一个四元式的序号，进行回填操作
+      quad = QTInfo.size + 1;
+    }
+    {
+      /*Goto L语句，采用定义性出现，即以S产生的第一个四元式的序号作为
+	  标号L的地址*/
+      quad++;
+      //如果res等于t.image，就跳转到quad四元式
+      QTInfo info = new QTInfo("case", res, t.image, quad);
+      qtTable.addQTInfo(info);
+    }
+    State() < BREAK > ";"
+  )+
+  < DEFAULT1 > ":"
+  {
+    quad1 = QTInfo.size + 1;
+  }
+  {
+    //如果前面都无法匹配，则进行default
+    quad1++;
+    QTInfo info = new QTInfo("case", res, "default", quad1);
+    qtTable.addQTInfo(info);
+  }
+  State() 
+  "}"
+}
+
+void IfState() :
+{
+  ConditionValue chain = null;
+  int mark;
+  int fmark;
+}
+{
+  < IF > 
+  < LB > 
+  chain = Condition()
+  {
+    chain.backpatchTrueChain(QTInfo.size + 1);
+  }
+  < RB > 
+  StateBlock()
+  {
+    fmark = QTInfo.size + 1;
+  }
+  (
+    LOOKAHEAD(1)
+    < ELSE >
+    {
+      //无条件跳转
+      QTInfo info = new QTInfo("J", "_", "_", 0);
+      qtTable.addQTInfo(info);
+      chain.backpatchFalseChain(QTInfo.size + 1);
+      fmark++;
+    }
+    StateBlock()
+    {
+      //也算是回填吧
+      info.setResult(QTInfo.size + 1);
+    }
+  )?
+  {
+    chain.backpatchFalseChain(fmark);
+  }
+}
+
+ConditionValue Condition() :
+{
+  int mark;
+  String first = null;
+  String middle = null;
+  String ropImage = null;
+  ConditionValue chain = new ConditionValue();
+}
+{
+  first = Expression()
+  (
+    ropImage = Relation() 
+    middle = Expression()
+  )?
+  {
+    mark = QTInfo.size + 1;
+    if (ropImage == null)
+    {
+      QTInfo info = new QTInfo("Jnz", first, "_", mark + 2);
+      qtTable.addQTInfo(info);
+      chain.mergeTrue(info);
+    }
+    else
+    {
+      QTInfo info = new QTInfo("J" + ropImage, first, middle, mark + 2);
+      qtTable.addQTInfo(info);
+      chain.mergeTrue(info);
+    }
+    //setResult
+    QTInfo info = new QTInfo("J", "_", "_", 0);
+    qtTable.addQTInfo(info);
+    chain.mergeFalse(info);
+    return chain;
+  }
+}
+
+String Relation() :
+{
+  Token t = null;
+}
+{
+  t = < GREATER >
+  {
+    return t.image;
+  }
+| t = < SMALLER >
+  {
+    return t.image;
+  }
+| t = < EQUAL >
+  {
+    return t.image;
+  }
+| t = < LE >
+  {
+    return t.image;
+  }
+| t = < GE >
+  {
+    return t.image;
+  }
+| t = < NE >
+  {
+    return t.image;
+  }
+}
+
+String LogicalOperator() :
+{
+  Token t = null;
+}
+{
+  t = < AND >
+  {
+    return t.image;
+  }
+| t = < OR >
+  {
+    return t.image;
+  }
+| t = < NOT >
+  {
+    return t.image;
+  }
+}
+
+void LoopState() :
+{
+}
+{
+  WhileState()
+| DoWhileState()
+| ForState()
+}
+
+void WhileState() :
+{
+  ConditionValue chain = null;
+  int quad;
+}
+{
+  < WHILE >
+  {
+    quad = QTInfo.size + 1;
+  }
+  < LB > 
+  chain = Condition() 
+  < RB >
+  {
+    chain.backpatchTrueChain(QTInfo.size + 1);
+  }
+  StateBlock()
+  {
+    qtTable.addQTInfo(new QTInfo("J", "_", "_", quad));
+    chain.backpatchFalseChain(QTInfo.size + 1);
+  }
+}
+
+void DoWhileState() :
+{
+  ConditionValue chain = null;
+  int fmark;
+  int tmark;
+}
+{
+  < DO >
+  {
+    tmark = QTInfo.size + 1;
+  }
+  StateBlock() 
+  < WHILE > 
+  < LB >
+  {
+  }
+  chain = Condition()
+  {
+    //qtTable.addQTInfo(new QTInfo("J","_","_",tmark));
+    chain.backpatchTrueChain(tmark);
+    chain.backpatchFalseChain(QTInfo.size + 1);
+  }
+  < RB > 
+  < SEMI >
+}
+
+void ForState() :
+{
+  ConditionValue chain = null;
+  int e2Begin = 0;
+  int e2End = 0;
+  int e3End = 0;
+  int e3Begin = 0;
+  int sBegin = 0, sEnd = 0;
+}
+{
+  < FOR > 
+  < LB >
+  (
+    AssState()
+    (
+      "," AssState()
+    )*
+  )?
+  ";"
+  //第二部分是： 条件 E2
+  (
+    {
+      e2Begin = QTInfo.size + 1;
+    }
+    chain = Condition()
+    {
+      e2End = QTInfo.size + 1;
+    }
+  )?
+  ";"
+  //第三部分：E3
+  (
+    {
+      e3Begin = QTInfo.size + 1;
+    }
+    AutoAS()
+    {
+      //无条件跳转
+      e3End = QTInfo.size + 1;
+      qtTable.addQTInfo(new QTInfo("J", "_", "_", e2Begin));
+    }
+  )?
+  //S部分
+  < RB >
+  {
+    sBegin = QTInfo.size + 1;
+  }
+  StateBlock()
+  {
+    //没问题，直接跳出循环
+    qtTable.addQTInfo(new QTInfo("J", "_", "_", e2End));
+    sEnd = QTInfo.size + 1;
+    //False chain
+    chain.backpatchFalseChain(sEnd);
+    //True chain
+    chain.backpatchTrueChain(sBegin);
+  }
+}
+
+//自增自减
+void AutoAS() :
+{
+  Token id;
+  Token op;
+  String newTemp;
+}
+{
+  id = < IDENTIFIER >
+  (
+    op = < AUTOADD >
+    {
+      //生成四元式，入链表,自增
+      //newTemp = VariableNameGenerator.genVariableName();
+      QTInfo qt = new QTInfo("+", id.image, "1", id.image);
+      qtTable.addQTInfo(qt);
+    }
+  | op = < AUTOSUBTRACT >
+    {
+      //生成四元式，入链表，自减
+      newTemp = VariableNameGenerator.genVariableName();
+      QTInfo info = new QTInfo("-", id.image, "1", newTemp);
+      QTInfo info1 = new QTInfo("=", newTemp, "_", id.image);
+      qtTable.addQTInfo(info);
+      qtTable.addQTInfo(info1);
+    }
+  )
+}
+
+//表达式
+String Expression() :		
+{
+  String first = null;
+}
+{		
+  first = AdditiveExpression()
+  {
+    return first;
+  }
+}
+
+String AdditiveExpression() :		
+{
+  String first = null;
+  String middle = null;
+  String newTemp = null;
+  Token op = null;
+}		
+{		
+  first = MultiplicativeExpression()
+  {
+    newTemp = first;
+  }		
+  (		
+    (		
+      op = < ADD >		
+    | op = < MINUS >
+    )		
+    middle = MultiplicativeExpression()
+    {
+      newTemp = VariableNameGenerator.genVariableName();
+      QTInfo qt = new QTInfo(op.image, first, middle, newTemp);
+      qtTable.addQTInfo(qt);
+      first = newTemp;
+    }	
+  )*
+  {
+    return newTemp;
+  }	
+}	
+
+String MultiplicativeExpression() :		
+{
+  String first = null, middle = null, newTemp = null;
+  Token op = null;
+}
+{		
+  first = UnaryExpression()
+  {
+    newTemp = first;
+  }	
+  (		
+    (		
+      op = < MULTIPLY >		
+    | op = < DIVIDE >		
+    | op = < QUYU >	
+    )		
+    middle = UnaryExpression() //middle是返回的字符串
+    {
+      newTemp = VariableNameGenerator.genVariableName();
+      QTInfo qt = new QTInfo(op.image, first, middle, newTemp);
+      qtTable.addQTInfo(qt);
+      first = newTemp;
+    }
+  )*
+  {
+    return newTemp;
+  }
+}
+
+String UnaryExpression() :
+{
+  String str = null;
+  Token t = null;
+}
+{
+  < LB > str = Expression() < RB >
+  {
+    return str;
+  }
+| t = Identifier()
+  {
+    return t.image;
+  }
+| t = Integer()
+  {
+    return t.image;
+  }
+| t = Float()
+  {
+    return t.image;
+  }
+}
+
+Token Float() :
+{
+  Token t = null;
+}
+{
+  t = < FLOAT_NUM >
+  {
+    return t;
+  }
+}
+
+Token Identifier() :
+{
+  Token t = null;
+}
+{
+  t = < IDENTIFIER >
+  {
+    return t;
+  }
+}
+
+Token Integer() :
+{
+  Token t = null;
+}
+{
+  t = < INTEGER_LITERAL >
+  {
+    return t;
+  }
+}

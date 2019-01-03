@@ -1,0 +1,10 @@
+void main()  
+{  
+    int i;  
+    int j;  
+    while(i < j)  
+    {  
+        i = i+2;  
+        j = j-2;  
+    }          
+}  

@@ -1,0 +1,13 @@
+int main()
+{
+    int a;
+    a = 0;
+    int c;
+    c = n;
+    do
+    {
+        a = a+1;
+        n = n-1;
+    }
+    while(n>0);
+}
